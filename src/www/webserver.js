@@ -1,15 +1,27 @@
-import exec from 'cordova/exec';
+import exec from "cordova/exec";
 
-const WEBSERVER_CLASS = 'Webserver';
-const START_FUNCTION = 'start';
-const ONREQUEST_FUNCTION = 'onRequest';
-const SENDRESPONSE_FUNCION = 'sendResponse';
-const STOP_FUNCTION = 'stop';
+const WEBSERVER_CLASS = "Webserver";
+const START_FUNCTION = "start";
+const ONREQUEST_FUNCTION = "onRequest";
+const SENDRESPONSE_FUNCION = "sendResponse";
+const STOP_FUNCTION = "stop";
 
-export function start(success_callback, error_callback, port) {
+export function start(
+  success_callback,
+  error_callback,
+  port,
+  keystore_path,
+  keystore_password
+) {
   let params = [];
   if (port) {
     params.push(port);
+  }
+  if (keystore_path) {
+    params.push(keystore_path);
+  }
+  if (keystore_password) {
+    params.push(keystore_password);
   }
   exec(
     success_callback,
@@ -23,7 +35,9 @@ export function start(success_callback, error_callback, port) {
 export function onRequest(success_callback) {
   exec(
     success_callback,
-    function(error) {console.error(error)},
+    function (error) {
+      console.error(error);
+    },
     WEBSERVER_CLASS,
     ONREQUEST_FUNCTION,
     []
@@ -46,11 +60,5 @@ export function sendResponse(
 }
 
 export function stop(success_callback, error_callback) {
-  exec(
-    success_callback,
-    error_callback,
-    WEBSERVER_CLASS,
-    STOP_FUNCTION,
-    []
-  );
+  exec(success_callback, error_callback, WEBSERVER_CLASS, STOP_FUNCTION, []);
 }

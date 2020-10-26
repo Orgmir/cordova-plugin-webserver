@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8,22 +8,28 @@ exports.onRequest = onRequest;
 exports.sendResponse = sendResponse;
 exports.stop = stop;
 
-var _exec = require('cordova/exec');
+var _exec = require("cordova/exec");
 
 var _exec2 = _interopRequireDefault(_exec);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var WEBSERVER_CLASS = 'Webserver';
-var START_FUNCTION = 'start';
-var ONREQUEST_FUNCTION = 'onRequest';
-var SENDRESPONSE_FUNCION = 'sendResponse';
-var STOP_FUNCTION = 'stop';
+var WEBSERVER_CLASS = "Webserver";
+var START_FUNCTION = "start";
+var ONREQUEST_FUNCTION = "onRequest";
+var SENDRESPONSE_FUNCION = "sendResponse";
+var STOP_FUNCTION = "stop";
 
-function start(success_callback, error_callback, port) {
+function start(success_callback, error_callback, port, keystore_path, keystore_password) {
   var params = [];
   if (port) {
     params.push(port);
+  }
+  if (keystore_path) {
+    params.push(keystore_path);
+  }
+  if (keystore_password) {
+    params.push(keystore_password);
   }
   (0, _exec2.default)(success_callback, error_callback, WEBSERVER_CLASS, START_FUNCTION, params);
 }
