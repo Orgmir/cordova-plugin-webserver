@@ -76,7 +76,7 @@ public class Webserver extends CordovaPlugin {
                 port = args.getInt(0);
             } catch (JSONException e) {
                 e.printStackTrace();
-                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, e.getMessage()));
+                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, e.toString()));
                 return;
             }
         }
@@ -100,7 +100,8 @@ public class Webserver extends CordovaPlugin {
 
             this.nanoHTTPDWebserver.start();
         } catch (Exception e) {
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, e.getMessage()));
+            e.printStackTrace();
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, e.toString()));
             return;
         }
 
@@ -139,7 +140,7 @@ public class Webserver extends CordovaPlugin {
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
         } catch (JSONException e) {
             e.printStackTrace();
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, e.getMessage()));
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, e.toString()));
         }
     }
 
