@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -65,7 +64,13 @@ public class NanoHTTPDWebserver extends NanoHTTPD {
         JSONObject jsonRequest = new JSONObject();
         jsonRequest.put("requestId", requestId);
         jsonRequest.put("body", this.getBodyText(session));
-        jsonRequest.put("headers", session.getHeaders());
+        if (session.getHeaders().size() > 0) {
+            JSONObject headers = new JSONObject();
+            for (Map.Entry<String, String> entry : session.getHeaders().entrySet()) {
+                headers.put(entry.getKey(), entry.getValue());
+            }
+            jsonRequest.put("headers", headers);
+        }
         jsonRequest.put("method", session.getMethod());
         jsonRequest.put("path", session.getUri());
         jsonRequest.put("query", session.getQueryParameterString());
@@ -189,6 +194,7 @@ public class NanoHTTPDWebserver extends NanoHTTPD {
 
     /**
      * Get mime type based of file extension
+     *
      * @param url
      * @return
      */
@@ -207,12 +213,13 @@ public class NanoHTTPDWebserver extends NanoHTTPD {
 
         String requestUUID = UUID.randomUUID().toString();
 
-        PluginResult pluginResult = null;
+        PluginResult pluginResult;
         try {
             pluginResult = new PluginResult(
                     PluginResult.Status.OK, this.createJSONRequest(requestUUID, session));
         } catch (JSONException e) {
             e.printStackTrace();
+            return null;
         }
         pluginResult.setKeepCallback(true);
         this.webserver.onRequestCallbackContext.sendPluginResult(pluginResult);
