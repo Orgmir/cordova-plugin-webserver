@@ -69,6 +69,7 @@ public class Webserver extends CordovaPlugin {
             } catch (JSONException e) {
                 e.printStackTrace();
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, e.getMessage()));
+                return;
             }
         }
 
@@ -96,13 +97,11 @@ public class Webserver extends CordovaPlugin {
             return;
         }
 
-        Log.d(
-                this.getClass().getName(),
-                "Server is running on: " +
-                        this.nanoHTTPDWebserver.getHostname() + ":" +
-                        this.nanoHTTPDWebserver.getListeningPort()
-        );
-        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+        String message = "Server is running on: " +
+                this.nanoHTTPDWebserver.getHostname() + ":" +
+                this.nanoHTTPDWebserver.getListeningPort();
+        Log.d(this.getClass().getName(), message);
+        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
     }
 
     /**
