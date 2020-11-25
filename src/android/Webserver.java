@@ -1,5 +1,6 @@
 package org.apache.cordova.plugin;
 
+import android.util.Base64;
 import android.util.Log;
 
 import org.apache.cordova.CallbackContext;
@@ -10,6 +11,7 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -90,10 +92,10 @@ public class Webserver extends CordovaPlugin {
             this.nanoHTTPDWebserver = new NanoHTTPDWebserver(port, this);
 
             if (args.length() >= 3) {
-                String keystorePath = args.getString(1);
+                String keystore = args.getString(1);
                 String keystorePassword = args.getString(2);
-                setupSSL(keystorePath, keystorePassword);
-                Log.d(this.getClass().getName(), "Setting up SSL with keystore " + keystorePath);
+                setupSSL(keystore, keystorePassword);
+                Log.d(this.getClass().getName(), "Setting up SSL with keystore " + keystore);
             } else {
                 Log.d(this.getClass().getName(), String.format("No SLL detected args: %d", args.length()));
             }
@@ -161,7 +163,7 @@ public class Webserver extends CordovaPlugin {
     /**
      * Setup SLL for the NanoHTTPDWebserver
      *
-     * @param keystorePath       the path to the keystore in the android assets
+     * @param keystoreString     the path to the keystore in the android assets
      * @param keystorePassphrase the passphrase to the keystore
      * @throws KeyStoreException
      * @throws IOException
@@ -169,15 +171,35 @@ public class Webserver extends CordovaPlugin {
      * @throws NoSuchAlgorithmException
      * @throws UnrecoverableKeyException
      */
-    private void setupSSL(String keystorePath, String keystorePassphrase) throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
-        KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-        InputStream keystoreStream = this.cordova.getActivity().getAssets().open(keystorePath);
+    private void setupSSL(String keystoreString, String keystorePassphrase) throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException {
+        InputStream keystoreStream = getKeystoreInputStream(keystoreString);
 
+        KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
         char[] passphrase = keystorePassphrase.toCharArray();
         keystore.load(keystoreStream, passphrase);
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         keyManagerFactory.init(keystore, passphrase);
         SSLServerSocketFactory socketFactory = NanoHTTPD.makeSSLSocketFactory(keystore, keyManagerFactory);
         this.nanoHTTPDWebserver.makeSecure(socketFactory, null);
+
+        keystoreStream.close();
+    }
+
+    /**
+     * Create an InputStream from the provided keystore
+     * <p>
+     * First it will try to open a file in the assets folder, otherwise it will assume it is a base64 string and decode it.
+     *
+     * @param keystore a file path to a keystore in the assets folder, or a base64 encoded keystore in BKS format
+     * @return a input stream for the file in the assets folder, or an input stream with the decoded base64 string
+     */
+    private InputStream getKeystoreInputStream(String keystore) {
+        try {
+            return this.cordova.getActivity().getAssets().open(keystore);
+        } catch (IOException e) {
+            // LR: Probably the keystore string isn't a file path,
+            byte[] bytes = Base64.decode(keystore, Base64.DEFAULT);
+            return new ByteArrayInputStream(bytes);
+        }
     }
 }

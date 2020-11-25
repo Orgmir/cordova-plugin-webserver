@@ -10,15 +10,15 @@ export function start(
   success_callback,
   error_callback,
   port,
-  keystore_path,
+  keystore,
   keystore_password
 ) {
   let params = [];
   if (port) {
     params.push(port);
   }
-  if (keystore_path) {
-    params.push(keystore_path);
+  if (keystore) {
+    params.push(keystore);
   }
   if (keystore_password) {
     params.push(keystore_password);

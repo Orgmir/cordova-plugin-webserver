@@ -20,13 +20,13 @@ var ONREQUEST_FUNCTION = "onRequest";
 var SENDRESPONSE_FUNCION = "sendResponse";
 var STOP_FUNCTION = "stop";
 
-function start(success_callback, error_callback, port, keystore_path, keystore_password) {
+function start(success_callback, error_callback, port, keystore, keystore_password) {
   var params = [];
   if (port) {
     params.push(port);
   }
-  if (keystore_path) {
-    params.push(keystore_path);
+  if (keystore) {
+    params.push(keystore);
   }
   if (keystore_password) {
     params.push(keystore_password);
